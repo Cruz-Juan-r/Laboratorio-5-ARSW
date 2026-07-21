@@ -6,6 +6,26 @@
 > - **Socket.IO (Node.js):** https://github.com/DECSIS-ECI/example-backend-socketio-node-/blob/main/README.md
 > - **STOMP (Spring Boot):** https://github.com/DECSIS-ECI/example-backend-stopm/tree/main
 
+## ✅ Estado actual — backend STOMP ya integrado
+
+Este front ahora funciona en vivo contra un backend propio en Spring Boot: **`Laboratorio4ARSW`** (repo hermano, CRUD del Lab 4), al que se le agregó soporte STOMP/WebSocket. Ya no es necesario clonar el repo guía de STOMP para probar la colaboración en tiempo real.
+
+- **Backend:** `../Laboratorio4ARSW` → `mvn spring-boot:run` → `http://localhost:8080`
+- **Endpoint STOMP:** `/ws-blueprints` · publica en `/app/draw` · suscribe a `/topic/blueprints.{author}.{name}`
+- **REST:** `GET /api/v1/blueprints/{author}/{name}` (versionado, respuesta envuelta en `{code,message,data}`)
+
+**Corrección aplicada:** `src/App.jsx` pedía `GET {API_BASE}/api/blueprints/{author}/{name}` (sin `/v1` y sin *unwrap* de la respuesta), lo que no calzaba con el backend real. Se corrigió para que, con la tecnología **STOMP**, use `/api/v1/blueprints/{author}/{name}` y lea `json.data`. La opción **Socket.IO** sigue apuntando al repo guía Node.js externo (sin cambios), ya que no se implementó un backend Socket.IO propio.
+
+**Demostración de colaboración en vivo (2 pestañas, autor `juan`, plano `plano-1`):**
+
+| Pestaña A dibuja | Pestaña B recibe el broadcast |
+|---|---|
+| ![Pestaña A](docs/screenshots/realtime-tab-1.jpg) | ![Pestaña B](docs/screenshots/realtime-tab-2.jpg) |
+
+Detalle completo de la integración (arquitectura del canal STOMP, DTOs, controlador) documentado en el README de [`Laboratorio4ARSW`](../Laboratorio4ARSW/README.md#tiempo-real-stomp--integración-con-el-front-laboratorio-5-arsw).
+
+---
+
 ## 🎯 Objetivo del laboratorio
 Implementar **colaboración en tiempo real** para el caso de BluePrints. El Front consume la API CRUD de la Parte 3 (o equivalente) y habilita tiempo real usando **Socket.IO** o **STOMP**, para que múltiples clientes dibujen el mismo plano de forma simultánea.
 

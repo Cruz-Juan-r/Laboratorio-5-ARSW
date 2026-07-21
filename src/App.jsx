@@ -16,9 +16,17 @@ export default function App() {
   const socketRef = useRef(null)
 
   useEffect(() => {
-    fetch(`${tech==='stomp'?API_BASE:IO_BASE}/api/blueprints/${author}/${name}`)
-      .then(r=>r.json())
-      .then(drawAll)
+    // El backend Spring (Laboratorio4ARSW) versiona la API y envuelve la
+    // respuesta en {code, message, data}; el backend Node/Socket.IO de la guía
+    // devuelve el blueprint sin envolver.
+    const url = tech === 'stomp'
+      ? `${API_BASE}/api/v1/blueprints/${author}/${name}`
+      : `${IO_BASE}/api/blueprints/${author}/${name}`
+
+    fetch(url)
+      .then(r => r.json())
+      .then(json => drawAll(tech === 'stomp' ? json.data : json))
+      .catch(() => drawAll({ points: [] }))
   }, [tech, author, name])
 
   function drawAll(bp) {
